@@ -24,7 +24,7 @@ case $1 in
     ;;
   -l|list)
     shift
-    tag.list $1
+    tag.list $1 $2
     ;;
   -a|add)
     shift
@@ -34,7 +34,7 @@ case $1 in
     shift
     tag.remove $1 $2
     ;;
-  -m|mind)
+  -m|search)
     shift
     tag.mind $1
     ;;
@@ -74,11 +74,11 @@ tag.help(){ printf "\e[1;37m%s\e[0m \e[1;36m%s\e[0m\n" "tag" "[$(tag.methods)]";
 tag.list(){
   local project=$(if test -z $1 || test "$1" == "."; then echo $(basename $(pwd));else echo $1;fi)
   if test -d $TODAY_PROJECTS/$project; then
-    grep "^$project\s" $TAGS_FILE | awk '{print $2}'
+    grep "^$project\s" $TAGS_FILE | awk '{print $2}' 
   fi  
 }
-tag.methods(){ echo "-a|-h|-l|-m|-r|-v"; }
-tag.mind(){
+tag.methods(){ echo "-a|-h|-l[project|context]|-m|-r|-v"; }
+tag.search(){
   local tags=(`echo $1 | sed 's/,/ /g'`)
   local projtags
   local projname
@@ -112,19 +112,14 @@ tag.setup(){
   export TAG_VERSION=v1.0.0
   export TAG_VERSION_DATE=2022.01.08
 
+  export TAGS_FILE=$TODAY_PROJECTS/.tags
+
   shopt -s extglob
 
   TAGS_PROJECTS='+(aws|chrome|codewars|conf|coursera|ebook|edx|exercism|futurelearn|graphacademy|hackerrank|javabrains|job|krishnamurti|lab360|linkedin|linuxacademy|oreilly|phoenix|pragmaticstudio|project|rails|sololearn|specialization|windriver|tutorial|tutorialspoint|udemy|jetbrains|research)'
-  TAGS_CONTEXTS='+(anki|bash|bigdata|bluemix|bootstrap|chartjs|cpp|css|delphi|design|devops|docker|elixir|elm|erlang|grails|groovy|hadoop|html|java|javascript|jekyll|jquery|nodejs|neo4j|phoenix|puppet|python|r|rails|reactjs|roblox|rspec|ruby|scratch|spring|sinatra|springboot|sql|sveltejs|unix|vim|vuejs|webpack|youtube|stimulusreflex)'
+  TAGS_CONTEXTS='+(anki|bash|bigdata|bluemix|bootstrap|chartjs|cpp|css|debian|delphi|design|devops|docker|elixir|elm|erlang|grails|groovy|hadoop|html|java|javascript|jekyll|jquery|nodejs|neo4j|phoenix|puppet|python|r|rails|reactjs|roblox|rspec|ruby|scratch|spring|sinatra|springboot|sql|sveltejs|unix|vim|vuejs|webpack|youtube|stimulusreflex)'
   
-  if ! test -f $HOME/Projects/project-today-manager/today; then
-    printf " \e[0;31m%s \e[0m\n" "=>" "Today is not installed."
-    exit 1
-  else 
-    source $HOME/Projects/project-today-manager/today
-    TAGS_FILE="$TODAY_PROJECTS/.tags"
-    ! test -f $TAGS_FILE && touch $TAGS_FILE
-  fi  
+  ! test -f $TAGS_FILE && touch $TAGS_FILE
 }
 tag.version(){
   printf "\e[0;37m%s \e[0m%s\n" "Tag" "$TAG_VERSION"
