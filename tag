@@ -17,7 +17,7 @@ case $1 in
   --help|-h|h|help)
     printf "\e[1;37m%s \e[0m\n" "Crafted (c) 2022 by Daitanlabs - We are stronger together"
     tag.version
-    printf "\e[1;37m%s \e[0m%s\n" "tag" "$(tag.help)" 
+    tag.help 
     printf "\n"  
     printf "\e[0;32m%s \e[4m%s\e[0m\e[0m\n" "homepage" "http://bitbucket.wrs.com/users/rmartins/repos/project-tag-manager"
     printf "\n"
@@ -70,10 +70,12 @@ tag.contains(){
     echo "n"
     return 1
 }
-tag.help(){ printf "\e[1;37m%s\e[0m \e[1;36m%s\e[0m\n" "tag" "[$(tags.methods)]"; }
+tag.help(){ printf "\e[1;37m%s\e[0m \e[1;36m%s\e[0m\n" "tag" "[$(tag.methods)]"; }
 tag.list(){
-  local project=$(if test -z $2 || test "$2" == "."; then echo $(basename $(pwd));else echo $2;fi)
-  grep "^$project\s" $TAGS_FILE | awk '{print $2}'
+  local project=$(if test -z $1 || test "$1" == "."; then echo $(basename $(pwd));else echo $1;fi)
+  if test -d $TODAY_PROJECTS/$project; then
+    grep "^$project\s" $TAGS_FILE | awk '{print $2}'
+  fi  
 }
 tag.methods(){ echo "-a|-h|-l|-m|-r|-v"; }
 tag.mind(){
